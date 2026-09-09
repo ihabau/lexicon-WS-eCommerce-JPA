@@ -1,0 +1,44 @@
+# ===============================
+# Web Server
+# ===============================
+# In production, we often use the default port 80 or 8080, or it's provided by the environment.
+server.port=8080
+
+# ===============================
+# Logging
+# ===============================
+# Production usually uses INFO or WARN level to avoid log bloat and protect sensitive data.
+logging.level.org.springframework=INFO
+logging.level.org.hibernate.SQL=ERROR
+logging.level.org.hibernate.orm.jdbc.bind=ERROR
+
+# ===============================
+# DataSource (MySQL - Production)
+# ===============================
+# URL, username, and password should ideally be provided via environment variables for security.
+# Using placeholders like ${DB_URL} is a standard practice in real production environments.
+spring.datasource.url=${DB_URL:jdbc:mysql://production-server:3306/event_db?useSSL=true&serverTimezone=Europe/Stockholm}
+spring.datasource.username=${DB_USERNAME:prod_user}
+spring.datasource.password=${DB_PASSWORD:secure_password_here}
+
+# ===============================
+# JPA / Hibernate
+# ===============================
+# Disable SQL logging in production for performance and security.
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
+
+# In production, 'validate' is the safest choice as it prevents accidental data loss.
+# It only checks if the existing database schema matches the JPA entities.
+spring.jpa.hibernate.ddl-auto=validate
+
+# ===============================
+# Connection Pool (HikariCP)
+# ===============================
+# Production pools are usually tuned for higher concurrent load.
+spring.datasource.hikari.pool-name=HikariProdPool
+spring.datasource.hikari.maximum-pool-size=20
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.connection-timeout=20000
+spring.datasource.hikari.idle-timeout=300000
+spring.datasource.hikari.max-lifetime=1200000

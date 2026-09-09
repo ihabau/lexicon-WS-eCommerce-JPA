@@ -1,4 +1,6 @@
-﻿# Lexicon WS eCommerce JPA
+﻿![Lexicon Logo](https://lexicongruppen.se/media/wi5hphtd/lexicon-logo.svg)
+
+# Lexicon WS eCommerce JPA
 
 Spring Boot e-commerce platform built with JPA, focusing on One-to-One relationships.
 
@@ -20,6 +22,9 @@ Spring Boot e-commerce platform built with JPA, focusing on One-to-One relations
 - [x] Workshop files committed
 - [x] Application starts without errors
 - [x] Pushed to GitHub
+- [x] Share with the teacher.
+- [x] added resources/applicaition.properties
+- [x] added prod properties
 
 ### Entities (Part 1)
 
