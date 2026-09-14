@@ -5,6 +5,7 @@ import lombok.*;
 import java.time.Instant;
 
 // these replacing the class boilerplate
+// @Data should get al of them at the same time
 @Getter
 @Setter
 @ToString
@@ -48,5 +49,8 @@ public class Customer {
             createdAt = Instant.now();
         }
     }
+
+    @PreUpdate
+    void onUpdate() {}
 
 }

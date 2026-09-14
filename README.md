@@ -28,20 +28,20 @@ Spring Boot e-commerce platform built with JPA, focusing on One-to-One relations
 
 ### Entities (Part 1)
 
-- [ ] Address (table `addresses`, unidirectional, standalone)
-- [ ] UserProfile (table `user_profiles`, inverse side with `mappedBy`)
-- [ ] Customer (table `customers`, owner side)
-  - [ ] Unidirectional One-to-One with Address (`address_id`)
-  - [ ] Bidirectional One-to-One with UserProfile (`profile_id`, optional)
+- [x] Address (table `addresses`, unidirectional, standalone)
+- [x] UserProfile (table `user_profiles`, inverse side with `mappedBy`)
+- [x] Customer (table `customers`, owner side)
+  - [x] Unidirectional One-to-One with Address (`address_id`)
+  - [x] Bidirectional One-to-One with UserProfile (`profile_id`, optional)
   - [ ] Cascading and orphan removal configured
 
 ### Repositories
 
 - [ ] CustomerRepository
-  - [ ] Find by email
-  - [ ] Find by last name (case-insensitive)
-  - [ ] Find by city
-  - [ ] Optional: email contains keyword, created after/between dates, count by city, exists by email
+  - [x] Find by email
+  - [x] Find by last name (case-insensitive)
+  - [x] Find by city
+  - [x] Optional: email contains keyword, created after/between dates, count by city, exists by email
 - [ ] UserProfileRepository
   - [ ] Find by nickname
   - [ ] Find by partial phone number
