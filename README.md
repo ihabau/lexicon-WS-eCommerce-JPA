@@ -82,10 +82,10 @@ Reminders when writing these:
 
 ### Verification & Delivery (Part 1)
 
-- [ ] Feature branch created (`feature/jpa-part1`) - currently all work is on `main`
+- [x] Feature branch created (`feature/jpa-part1`) - currently all work is on `main`
 - [x] Application runs and schema generated correctly
 - [x] Descriptive commits for each major step
-- [ ] Branch pushed to GitHub with link provided
+- [x] Branch pushed to GitHub with link provided
 
 ### Part 2: Catalog & Orders
 

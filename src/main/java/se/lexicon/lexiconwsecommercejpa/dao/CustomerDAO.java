@@ -22,4 +22,11 @@ public interface CustomerDAO {
     Boolean existByEmail(String email);
     int updateNameByEmail(String name, String email);
     // some of these where completed by autocomplete. Spring??
+
+    // Missing optional queries (workshop "CustomerRepository optional", SpringBoot-DataJPA-Workshop-Part1.md):
+    // - findByEmailContaining(String keyword)                -> email contains keyword
+    // - findByCreatedAfter(Instant date)                     -> created after ONE date   (needs import java.time.Instant)
+    // - findByCreatedBetween(Instant start, Instant end)     -> created between TWO dates (needs import java.time.Instant)
+    // - countByCity(String city)                             -> returns long/Long, NOT List<Customer>
+    // - existByEmail(...) is declared above but has no implementation in CostumerDAOImpl yet
 }
