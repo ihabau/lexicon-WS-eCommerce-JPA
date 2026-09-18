@@ -2,6 +2,8 @@
 
 # Workshop: E-commerce Platform JPA (Part 1)
 
+> **Reference**: See `Spring-Data-JPA-Annotation-Guide.md` for a quick guide to the JPA annotations used in this workshop. See `SpringBoot-DataJPA-Workshop-Part2.md` for the Part 2 assignment.
+
 ## Objective
 
 Build the foundation of an E-commerce system focusing on **One-to-One relationships**.
