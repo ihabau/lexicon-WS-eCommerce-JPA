@@ -146,10 +146,13 @@ erDiagram
     - [x] `findByCreatedAfter` - created after one date
     - [x] `findByCreatedBetween` - created between two dates
     - [x] `countByCity` - count of customers in a city
-- [x] UserProfileDAO / UserProfileDAOImpl - interface + skeleton, query methods still TODO stubs
-  - [ ] Find by nickname (`findByNickName`)
-  - [ ] Find by partial phone number (`findByPhoneNumberContaining`)
-  - [ ] Optional: bio not null, nickname prefix, count by phone prefix
+- [x] UserProfileDAO / UserProfileDAOImpl - fully implemented
+  - [x] Find by nickname, case-insensitive (`findByNickName`)
+  - [x] Find by partial phone number (`findByPhoneNumberContaining`)
+  - [x] Find by bio not null (`findByBioIsNotNull`)
+  - [x] Optional: nickname prefix (`findByNickNameStartingWith`), count by phone prefix (`countByPhoneNumberStartingWith`)
+  - [x] Existence checks: existByNickName / existByPhoneNumber
+  - [x] CRUD: findById, save, findAll, update, delete, deleteById
 - [x] AddressDAO / AddressDAOImpl - interface + skeleton, query methods still TODO stubs
   - [ ] Find by zip code (`findByZipCode`)
   - [ ] Optional: find by city, street name, zip code prefix, count by zip (customers)
