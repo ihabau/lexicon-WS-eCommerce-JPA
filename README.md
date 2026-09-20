@@ -13,6 +13,100 @@ Spring Boot e-commerce platform built with JPA, focusing on One-to-One relations
 - Lombok
 - Maven
 
+## Entity-Relationship Diagram (Mermaid)
+
+Full database schema from **Part 1** (One-to-One) and **Part 2** (catalog, orders, many-to-many).
+
+```mermaid
+erDiagram
+    %% ===== Part 1: One-to-One =====
+    ADDRESSES {
+        BIGINT id PK
+        VARCHAR street
+        VARCHAR city
+        VARCHAR zip_code
+    }
+
+    USER_PROFILES {
+        BIGINT id PK
+        VARCHAR nickname
+        VARCHAR phone_number
+        VARCHAR bio
+    }
+
+    CUSTOMERS {
+        BIGINT id PK
+        VARCHAR first_name
+        VARCHAR last_name
+        VARCHAR email UK
+        TIMESTAMP created_at
+        BIGINT address_id FK
+        BIGINT profile_id FK
+    }
+
+    %% ===== Part 2: Catalog & Orders =====
+    CATEGORIES {
+        BIGINT id PK
+        VARCHAR name
+    }
+
+    PRODUCTS {
+        BIGINT id PK
+        VARCHAR name
+        DECIMAL price
+        BIGINT category_id FK
+    }
+
+    PRODUCT_IMAGES {
+        BIGINT product_id FK
+        VARCHAR image_url
+    }
+
+    PROMOTIONS {
+        BIGINT id PK
+        VARCHAR code UK
+        DATE start_date
+        DATE end_date
+    }
+
+    PRODUCTS_PROMOTIONS {
+        BIGINT product_id FK
+        BIGINT promotion_id FK
+    }
+
+    ORDERS {
+        BIGINT id PK
+        TIMESTAMP order_date
+        VARCHAR status
+        BIGINT customer_id FK
+    }
+
+    ORDER_ITEMS {
+        BIGINT id PK
+        INT quantity
+        DECIMAL price_at_purchase
+        BIGINT order_id FK
+        BIGINT product_id FK
+    }
+
+    %% One-to-One
+    ADDRESSES ||--|| CUSTOMERS : "address_id"
+    USER_PROFILES ||--o| CUSTOMERS : "profile_id"
+
+    %% Catalog (1:M / element collection)
+    CATEGORIES ||--o{ PRODUCTS : "category_id"
+    PRODUCTS ||--o{ PRODUCT_IMAGES : "product_id"
+
+    %% Product Promotion (M:N via join table)
+    PRODUCTS ||--o{ PRODUCTS_PROMOTIONS : "product_id"
+    PROMOTIONS ||--o{ PRODUCTS_PROMOTIONS : "promotion_id"
+
+    %% Orders (1:M + M:1)
+    CUSTOMERS ||--o{ ORDERS : "customer_id"
+    ORDERS ||--o{ ORDER_ITEMS : "order_id"
+    PRODUCTS ||--o{ ORDER_ITEMS : "product_id"
+```
+
 ## Project Checklist
 
 ### Setup
@@ -37,20 +131,28 @@ Spring Boot e-commerce platform built with JPA, focusing on One-to-One relations
 
 ### Repositories (Part 1)
 
-> Currently backed by a DAO layer (`CustomerDAO` / `CostumerDAOImpl`) instead of the Spring Data `JpaRepository` interfaces specified in the workshop.
+> Backed by a DAO layer (`...DAO` interfaces + `...DAOImpl`) instead of the Spring Data `JpaRepository` interfaces specified in the workshop.
 
-- [ ] CustomerRepository (Spring Data)
-  - [x] Find by email (`CustomerDAO.findByEmail`)
-  - [ ] Find by last name (case-insensitive) - `findByLastName` is still a stub
-  - [ ] Find by city - `findByCity` is still a stub
-  - [ ] Optional: email contains keyword, created after/between dates, count by city (only `existsByEmail` present)
-- [ ] UserProfileRepository
-  - [ ] Find by nickname
-  - [ ] Find by partial phone number
+- [x] CustomerDAO / CostumerDAOImpl - fully implemented
+  - [x] Find by email (`findByEmail`)
+  - [x] Find by last name, case-insensitive (`findByLastName`)
+  - [x] Find by city (`findByCity`)
+  - [x] Find by full name / first name (`findByFullName`, `findByFirstName`)
+  - [x] CRUD: save, findAll, update, delete, deleteById, deleteByFullName
+  - [x] Existence checks: existByFirstName / existByLastName / existByFullName / existByEmail
+  - [x] Bulk updates: updateFirstNameByEmail / updateLastNameByEmail / updateFullNameByEmail
+  - [x] Optional Spring Data queries (implemented):
+    - [x] `findByEmailContaining` - email contains keyword
+    - [x] `findByCreatedAfter` - created after one date
+    - [x] `findByCreatedBetween` - created between two dates
+    - [x] `countByCity` - count of customers in a city
+- [x] UserProfileDAO / UserProfileDAOImpl - interface + skeleton, query methods still TODO stubs
+  - [ ] Find by nickname (`findByNickName`)
+  - [ ] Find by partial phone number (`findByPhoneNumberContaining`)
   - [ ] Optional: bio not null, nickname prefix, count by phone prefix
-- [ ] AddressRepository
-  - [ ] Find by zip code
-  - [ ] Optional: find by city, street name, zip code prefix, count by zip code
+- [x] AddressDAO / AddressDAOImpl - interface + skeleton, query methods still TODO stubs
+  - [ ] Find by zip code (`findByZipCode`)
+  - [ ] Optional: find by city, street name, zip code prefix, count by zip (customers)
 
 ### Optional Task: CustomerRepository / CustomerDAO
 
@@ -60,7 +162,9 @@ parameters - an email lookup and a date filter are different questions.
 
 1. **Email contains a keyword**: a method like `findByEmailContaining(String keyword)`. The concept is any
    email that has the keyword somewhere in the middle. In JPQL this is `LIKE` with `%` wildcards around the
-   bound value: `c.email LIKE %:keyword%`. You build the `%` into the value you pass, not into the JPQL.
+   bound value. The impl currently puts the `%` into the JPQL via `CONCAT`:
+   `c.email LIKE LOWER(CONCAT('%', :keyword, '%'))`. You can also build the `%` into the value you pass
+   (`"%" + keyword + "%"`) and keep the JPQL as a plain `LIKE :keyword`.
 2. **Created after a date**: takes **one** `Instant`, e.g. `findByCreatedAfter(Instant date)`. Concept:
    `c.createdAt > :date` (use `>=` if you want to include customers created at that exact moment).
 3. **Created between two dates**: takes **two** `Instant`s (start and end), e.g.
