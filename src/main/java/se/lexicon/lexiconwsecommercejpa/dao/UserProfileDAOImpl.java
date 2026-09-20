@@ -15,103 +15,120 @@ public class UserProfileDAOImpl implements UserProfileDAO {
 
     @Override
     public UserProfile findById(long id) {
+        // same pattern as CustomerDAOImpl.findById
         return em.find(UserProfile.class, id);
     }
 
     @Override
     @Transactional
     public UserProfile save(UserProfile userProfile) {
-        // TIP: merge() upserts - works for both new (id == 0) and existing profiles.
+        // same pattern as CustomerDAOImpl.save - merge upserts new and existing rows
         return em.merge(userProfile);
     }
 
     @Override
     public List<UserProfile> findAll() {
-        return em.createQuery("SELECT p FROM UserProfile p", UserProfile.class)
+        // same pattern as CustomerDAOImpl.findAll
+        return em.createQuery("SELECT p from UserProfile p", UserProfile.class)
             .getResultList();
     }
 
     @Override
     @Transactional
     public UserProfile update(UserProfile userProfile) {
+        // same pattern as CustomerDAOImpl.update
         return em.merge(userProfile);
-    }
-
-    @Override
-    public UserProfile findByNickName(String nickName) {
-        // TODO: exact, case-insensitive lookup:
-        //      em.createQuery("SELECT p FROM UserProfile p WHERE LOWER(p.nickName) = LOWER(:nickName)", UserProfile.class)
-        //        .setParameter("nickName", nickName.toLowerCase())
-        //        .getSingleResult();
-        // TIP: getSingleResult() throws NoResultException / NonUniqueResultException -
-        //      use getResultList() + isEmpty() if duplicates are possible.
-        return null;
-    }
-
-    @Override
-    public List<UserProfile> findByPhoneNumberContaining(String keyword) {
-        // TODO: partial phone-number search - use LIKE with the wildcards on ONE side:
-        //      em.createQuery("SELECT p FROM UserProfile p WHERE LOWER(p.phoneNumber) LIKE LOWER(CONCAT('%', :keyword, '%'))", UserProfile.class)
-        //        .setParameter("keyword", keyword)
-        //        .getResultList();
-        return null;
-    }
-
-    @Override
-    public List<UserProfile> findByBioIsNotNull() {
-        // TODO: em.createQuery("SELECT p FROM UserProfile p WHERE p.bio IS NOT NULL", UserProfile.class)
-        //        .getResultList();
-        return null;
-    }
-
-    @Override
-    public List<UserProfile> findByNickNameStartingWith(String prefix) {
-        // TODO: prefix match - bind ":prefix" as prefix + "%":
-        //      em.createQuery("SELECT p FROM UserProfile p WHERE LOWER(p.nickName) LIKE LOWER(:prefix)", UserProfile.class)
-        //        .setParameter("prefix", prefix.toLowerCase() + "%")
-        //        .getResultList();
-        return null;
-    }
-
-    @Override
-    public Long countByPhoneNumberStartingWith(String prefix) {
-        // TODO: SELECT COUNT(p) ... WHERE p.phoneNumber LIKE :prefix, typed as Long.class;
-        //      e.g. SELECT COUNT(p) FROM UserProfile p WHERE LOWER(p.phoneNumber) LIKE LOWER(:prefix),
-        //      .setParameter("prefix", prefix.toLowerCase() + "%").getSingleResult();
-        return 0L;
     }
 
     @Override
     @Transactional
     public Boolean delete(UserProfile userProfile) {
-        // TODO: FK caveat - UserProfile is the INVERSE side of the OneToOne
-        //      (mappedBy = "profile" on Customer). Deleting a profile the Customer still
-        //      references breaks the profile_id FK. Null out customer.profile first
-        //      (or rely on Customer's orphanRemoval), then em.remove the managed instance.
+        // TIP: FK caveat - UserProfile is the INVERSE side (mappedBy = "profile").
+        //      Deleting a profile a Customer still references can break the profile_id FK.
+        // same pattern as CustomerDAOImpl.delete otherwise - remove the managed instance.
+        UserProfile managed = em.find(UserProfile.class, userProfile.getId());
+
+        if (managed != null) {
+            em.remove(managed);
+            return true;
+        }
         return false;
     }
 
     @Override
     @Transactional
     public Boolean deleteById(long id) {
-        // TODO: managed = em.find(UserProfile.class, id);
-        //      if (managed != null) { em.remove(managed); return true; } return false;
-        //      Same FK caveat as delete(UserProfile).
+        // TIP: same FK caveat as delete(UserProfile) above.
+        // same pattern as CustomerDAOImpl.deleteById
+        UserProfile userProfile = em.find(UserProfile.class, id);
+
+        if (userProfile != null) {
+            em.remove(userProfile);
+            return true;
+        }
         return false;
+    }
+
+    @Override
+    public UserProfile findByNickName(String nickName) {
+        // now correct - :nickName placeholder and .setParameter("nickName") match (case-sensitive)
+        // TIP: the try/catch around getSingleResult() is good - it is the only way to avoid a
+        //      NoResultException escaping when no profile matches.
+        try {
+        return em.createQuery("SELECT p FROM UserProfile p WHERE LOWER(p.nickName) = LOWER(:nickName)", UserProfile.class)
+            .setParameter("nickName", nickName.toLowerCase())
+            .getSingleResult();
+        } catch (jakarta.persistence.NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public List<UserProfile> findByPhoneNumberContaining(String keyword) {
+        return em.createQuery("SELECT p FROM UserProfile p WHERE p.phoneNumber LIKE CONCAT('%', :keyword, '%')", UserProfile.class)
+            .setParameter("keyword", keyword)
+            .getResultList();
+    }
+
+    @Override
+    public List<UserProfile> findByBioIsNotNull() {
+        return em.createQuery("SELECT p FROM UserProfile p WHERE p.bio IS NOT NULL", UserProfile.class)
+            .getResultList();
+    }
+
+    @Override
+    public List<UserProfile> findByNickNameStartingWith(String prefix) {
+        // now correct - surplus ")" removed, LIKE + CONCAT reads cleanly
+        return em.createQuery("SELECT p FROM UserProfile p WHERE LOWER(p.nickName) LIKE CONCAT(:prefix, '%')", UserProfile.class)
+            .setParameter("prefix", prefix)
+            .getResultList();
+    }
+
+    @Override
+    public Long countByPhoneNumberStartingWith(String prefix) {
+        return em.createQuery("SELECT COUNT(p) FROM UserProfile p WHERE p.phoneNumber like CONCAT(:prefix, '%')", Long.class)
+            .setParameter("prefix", prefix)
+            .getSingleResult();
     }
 
     @Override
     public Boolean existByNickName(String nickName) {
-        // TODO: SELECT COUNT(p) FROM UserProfile p WHERE LOWER(p.nickName) = LOWER(:nickName)
-        //      with Long.class, then return count > 0.
-        return false;
+        // now correct - field, placeholder and count-typing all match
+        Long count = em.createQuery("SELECT COUNT(p) FROM UserProfile p WHERE LOWER(p.nickName) = LOWER(:nickName)", Long.class)
+            .setParameter("nickName", nickName)
+            .getSingleResult();
+        
+        return count > 0;
     }
 
     @Override
     public Boolean existByPhoneNumber(String phoneNumber) {
-        // TODO: SELECT COUNT(p) FROM UserProfile p WHERE p.phoneNumber = :phoneNumber
-        //      with Long.class, then return count > 0.
-        return false;
+        // now correct - missing "=", Boolean.class and parameter binding all fixed
+        Long count = em.createQuery("SELECT COUNT(p) FROM UserProfile p WHERE p.phoneNumber = :phoneNumber", Long.class)
+            .setParameter("phoneNumber", phoneNumber)
+            .getSingleResult();
+        
+        return count > 0;
     }
 
 }
