@@ -153,9 +153,11 @@ erDiagram
   - [x] Optional: nickname prefix (`findByNickNameStartingWith`), count by phone prefix (`countByPhoneNumberStartingWith`)
   - [x] Existence checks: existByNickName / existByPhoneNumber
   - [x] CRUD: findById, save, findAll, update, delete, deleteById
-- [x] AddressDAO / AddressDAOImpl - interface + skeleton, query methods still TODO stubs
-  - [ ] Find by zip code (`findByZipCode`)
-  - [ ] Optional: find by city, street name, zip code prefix, count by zip (customers)
+- [x] AddressDAO / AddressDAOImpl - fully implemented
+  - [x] Find by zip code (`findByZipCode`)
+  - [x] Optional: find by city, street name, zip code prefix, count by zip (customers)
+  - [x] Existence check: existByZipCode
+  - [x] CRUD: findById, save, findAll, update, delete, deleteById
 
 ### Optional Task: CustomerRepository / CustomerDAO
 
@@ -196,7 +198,7 @@ Reminders when writing these:
 
 ### Part 2: Catalog & Orders
 
-- [ ] Feature branch created (`feature/jpa-part2`)
+- [x] Feature branch created (`feature/jpa-part2`)
 - [ ] Entities & enums (Category, Product, Promotion, Order, OrderItem, OrderStatus)
 - [ ] Relationships (Many-to-One, One-to-Many, Many-to-Many) with ownership and cascading
 - [ ] Repositories (Category, Product, Order, Promotion) incl. N+1-safe order-status query
