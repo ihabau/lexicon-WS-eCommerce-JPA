@@ -146,15 +146,6 @@ erDiagram
     - [x] `findByCreatedAfter` - created after one date
     - [x] `findByCreatedBetween` - created between two dates
     - [x] `countByCity` - count of customers in a city
-<<<<<<< Updated upstream
-- [x] UserProfileDAO / UserProfileDAOImpl - interface + skeleton, query methods still TODO stubs
-  - [ ] Find by nickname (`findByNickName`)
-  - [ ] Find by partial phone number (`findByPhoneNumberContaining`)
-  - [ ] Optional: bio not null, nickname prefix, count by phone prefix
-- [x] AddressDAO / AddressDAOImpl - interface + skeleton, query methods still TODO stubs
-  - [ ] Find by zip code (`findByZipCode`)
-  - [ ] Optional: find by city, street name, zip code prefix, count by zip (customers)
-=======
 - [x] UserProfileDAO / UserProfileDAOImpl - fully implemented
   - [x] Find by nickname, case-insensitive (`findByNickName`)
   - [x] Find by partial phone number (`findByPhoneNumberContaining`)
@@ -167,7 +158,6 @@ erDiagram
   - [x] Optional: find by city, street name, zip code prefix, count by zip (customers)
   - [x] Existence check: existByZipCode
   - [x] CRUD: findById, save, findAll, update, delete, deleteById
->>>>>>> Stashed changes
 
 ### Optional Task: CustomerRepository / CustomerDAO
 
@@ -208,7 +198,7 @@ Reminders when writing these:
 
 ### Part 2: Catalog & Orders
 
-- [ ] Feature branch created (`feature/jpa-part2`)
+- [x] Feature branch created (`feature/jpa-part2`)
 - [ ] Entities & enums (Category, Product, Promotion, Order, OrderItem, OrderStatus)
 - [ ] Relationships (Many-to-One, One-to-Many, Many-to-Many) with ownership and cascading
 - [ ] Repositories (Category, Product, Order, Promotion) incl. N+1-safe order-status query
