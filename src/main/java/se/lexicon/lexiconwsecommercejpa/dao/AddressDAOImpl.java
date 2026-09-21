@@ -68,50 +68,54 @@ public class AddressDAOImpl implements AddressDAO {
 
     @Override
     public List<Address> findByZipCode(String zipCode) {
-        // TODO: exact, case-insensitive match on address zip code.
-        // TIP (JPQL): SELECT a FROM Address a WHERE LOWER(a.zipCode) = LOWER(:zipCode)
-        //      - exactly like CustomerDAOImpl.findByLastName.
-        return null;
+        // now correct - balanced parentheses, LOWER on each side of "=", params match
+        return em.createQuery("SELECT a FROM Address a WHERE LOWER(a.zipCode) = LOWER(:zipCode)", Address.class)
+            .setParameter("zipCode", zipCode.toLowerCase())
+            .getResultList();
     }
 
     @Override
     public List<Address> findByCity(String city) {
-        // TODO: exact, case-insensitive match on address city.
-        // TIP (JPQL): SELECT a FROM Address a WHERE LOWER(a.city) = LOWER(:city)
-        //      - like CustomerDAOImpl.findByCity (but without the c.address. prefix).
-        return null;
+        // now correct - balanced parentheses, LOWER on each side of "=", params match
+        return em.createQuery("SELECT a FROM Address a WHERE LOWER(a.city) = LOWER(:city)", Address.class)
+            .setParameter("city", city.toLowerCase())
+            .getResultList();
     }
 
     @Override
     public List<Address> findByStreet(String street) {
-        // TODO: exact match on street name.
-        // TIP (JPQL): SELECT a FROM Address a WHERE LOWER(a.street) = LOWER(:street),
-        //      typed as Address.class, .setParameter(...).getResultList().
-        return null;
+        // now correct - balanced parentheses, LOWER on each side of "=", params match
+        return em.createQuery("SELECT a FROM Address a WHERE LOWER(a.street) = LOWER(:street)", Address.class)
+            .setParameter("street", street.toLowerCase())
+            .getResultList();
     }
 
     @Override
     public Long countByZipCode(String zipCode) {
-        // TODO: counts CUSTOMERS living in the zip, so the query starts from Customer:
-        //      SELECT COUNT(c) FROM Customer c WHERE c.address.zipCode = :zipCode
-        //      typed as Long.class - the alias pattern is from CustomerDAOImpl.countByCity.
-        return 0L;
+        // now correct - counts customers via c.address (Long.class, single result)
+        Long count = em.createQuery("SELECT COUNT(c) FROM Customer c WHERE c.address.zipCode = :zipCode", Long.class)
+            .setParameter("zipCode", zipCode)
+            .getSingleResult();
+
+        return count;
     }
 
     @Override
     public List<Address> findByZipCodeStartingWith(String prefix) {
-        // TODO: prefix match - bind ":prefix" as prefix + "%".
-        // TIP (JPQL): SELECT a FROM Address a WHERE LOWER(a.zipCode) LIKE LOWER(:prefix)
-        //      - mirror the contains-style binding from CustomerDAOImpl.findByEmailContaining.
-        return null;
+        // now correct - LIKE with CONCAT prefix, params match
+        return em.createQuery("SELECT a FROM Address a WHERE LOWER(a.zipCode) LIKE LOWER(CONCAT( :prefix, '%' ))", Address.class)
+            .setParameter("prefix", prefix)
+            .getResultList();
     }
 
     @Override
     public Boolean existByZipCode(String zipCode) {
-        // TODO: SELECT COUNT(a) FROM Address a WHERE LOWER(a.zipCode) = LOWER(:zipCode)
-        //      typed as Long.class, then return count > 0 -
-        //      exactly the existByFirstName pattern in CustomerDAOImpl.
-        return false;
+        // now correct - Long.class + count > 0, case-insensitive match
+        Long count = em.createQuery("SELECT COUNT(a) FROM Address a WHERE LOWER(a.zipCode) = LOWER(:zipCode)", Long.class)
+            .setParameter("zipCode", zipCode.toLowerCase())
+            .getSingleResult();
+
+        return count > 0;
     }
 
 }

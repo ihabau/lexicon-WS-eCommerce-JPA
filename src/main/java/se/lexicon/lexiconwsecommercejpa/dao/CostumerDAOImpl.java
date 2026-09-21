@@ -40,7 +40,7 @@ public class CostumerDAOImpl implements CustomerDAO {
 
     @Override
     public List<Customer> findByFullName(String name) {
-        return em.createQuery("SELECT c from Customer c where LOWER(CONCAT(c.firstName, ' ', c.lastName)) = LOWER(:name)", Customer.class)
+        return em.createQuery("SELECT c from Customer c where LOWER(CONCAT( COALESCE( c.firstName, ''), ' ', COALESCE( c.lastName, ''))) = LOWER(:name)", Customer.class)
             .setParameter("name", name.toLowerCase())
             .getResultList();
     }
