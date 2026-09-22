@@ -2,7 +2,7 @@ package se.lexicon.lexiconwsecommercejpa.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.*;
 
 /*
@@ -16,6 +16,36 @@ import java.util.*;
  *  - OPTIONAL bidirectional many-to-many BACK to Product (the INVERSE side;
  *    Product owns the join table via its field named "promotions")
  */
+
+  @Getter
+  @Setter
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @ToString
+  @EqualsAndHashCode
+
+  @Entity
+  @Table(name = "promotions")
+
+
 public class Promotion {
     // TODO: add fields + JPA annotations per the requirements above.
+
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(nullable = false, unique = true, length = 100)
+  private String code;
+
+  @Column(nullable = false)
+  private Instant startDate;
+
+  @Column(nullable = true)
+  private Instant endDate;
+
+  @ManyToMany(mappedBy = "promotions" )
+  private List<Product> products = new ArrayList<>();
+
 }

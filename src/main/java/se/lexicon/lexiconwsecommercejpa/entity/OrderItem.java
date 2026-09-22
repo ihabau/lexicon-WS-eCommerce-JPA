@@ -16,6 +16,45 @@ import java.math.BigDecimal;
  *  - many-to-one to Order - the OWNER side of the relationship (FK "order_id")
  *  - many-to-one to Product (FK "product_id")
  */
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+@EqualsAndHashCode
+
+@Entity
+@Table(name = "order_items")
+
+
+
+
 public class OrderItem {
     // TODO: add fields + JPA annotations per the requirements above.
+
+@Id
+@GeneratedValue( strategy = GenerationType.IDENTITY )
+private Long id;
+
+@Column(nullable = false)
+private int quantity;
+
+@Column(nullable = false, precision = 10, scale = 2)
+private BigDecimal priceAtPurchase;
+
+
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "order_id", nullable = false)
+private Order order;
+
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "product_id", nullable = false)
+private Product product;
+
+
+
+
+
+
 }
