@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local backups (old DAO pattern - not part of the project) ###
+/backup/

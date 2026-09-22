@@ -3,29 +3,45 @@ package se.lexicon.lexiconwsecommercejpa.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-// these replacing the class boilerplate
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
+/*
+ * ADDRESS - Part 1 entity (Part1.md:114-121).
+ * TODO: build it.
+ *  - a JPA entity mapped to the "addresses" table
+ *  - identity-generated primary key (Long id)
+ *  - street, city, zipCode: all mandatory columns
+ *  - standalone: does NOT reference Customer
+ */
 
-@Entity
-@Table(name = "addresses")
+
+
+   @Getter
+   @Setter
+   @NoArgsConstructor
+   @AllArgsConstructor
+   @ToString
+   @EqualsAndHashCode
+
+   @Entity
+   @Table(name = "addresses")
+
+
 public class Address {
+    // TODO: add fields + JPA annotations per the requirements above.
+    //
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private String street;
+  @Column(nullable = false)
+  private String street;
 
-    @Column(nullable = false)
-    private String city;
+  @Column(nullable = false)
+  private String city;
 
-    @Column(nullable = false)
-    private String zipCode;
+  @Column(nullable = false)
+  private String zipCode;
+
+
 
 }

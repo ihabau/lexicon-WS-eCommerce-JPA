@@ -1,56 +1,61 @@
 package se.lexicon.lexiconwsecommercejpa.entity;
 
+// Imports you will need for the annotations below:
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
 
-// these replacing the class boilerplate
-// @Data should get al of them at the same time
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
+/*
+ * =====================================================================
+ * CUSTOMER - Part 1 entity, the OWNER side of both @OneToOne relations.
+ * Data model only. Queries live in CustomerRepository.
+ *
+ * The class body is empty ON PURPOSE - rebuild it (doc = Part1.md:134-152).
+ * =====================================================================
+ */
+   @Getter
+   @Setter
+   @NoArgsConstructor
+   @AllArgsConstructor
+   @ToString
+   @EqualsAndHashCode
 
-@Entity
-@Table(name = "customers")
+   @Entity
+   @Table(name = "customers")
+
 public class Customer {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private Long id;
+
+   // firstName & lastName (doc: mandatory, max 100)
     @Column(nullable = false, length = 100)
     private String firstName;
-
     @Column(nullable = false, length = 100)
     private String lastName;
 
     @Column(nullable = false, unique = true, length = 150)
     private String email;
-
-    @Column(updatable = false, nullable = false)
-    private Instant createdAt; // instant is a standard timeStamp UTC
+    
+    @Column( updatable = false, nullable = false)
+    private Instant createdAt;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, optional = false)
     @JoinColumn(name = "address_id")
     private Address address;
 
-    // ai corrected this for me
-    // ask teacher why these are needed in chat later
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_id")
     private UserProfile profile;
 
+
     @PrePersist
     void onCreate() {
-        if (createdAt == null) {
-            createdAt = Instant.now();
-        }
+      if (createdAt == null) {
+        createdAt = Instant.now();
+      }
     }
-
-    @PreUpdate
-    void onUpdate() {}
-
 }
