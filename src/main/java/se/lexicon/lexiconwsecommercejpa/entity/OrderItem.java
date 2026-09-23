@@ -17,12 +17,13 @@ import java.math.BigDecimal;
  *  - many-to-one to Product (FK "product_id")
  */
 
+// No @ToString/@EqualsAndHashCode: `order` is bidirectional (Order holds this
+// item in its items collection + cascade), so walking fields would recurse
+// forever in generated toString/equals/hashCode. Equality is the `id`.
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-@EqualsAndHashCode
 
 @Entity
 @Table(name = "order_items")

@@ -16,12 +16,13 @@ import lombok.*;
  */
 
 
+   // No @ToString/@EqualsAndHashCode: `customer` is bidirectional (Customer
+   // owns a back-reference via profile), which would recurse forever in
+   // generated toString/equals/hashCode. Equality is the `id`.
    @Getter
    @Setter
    @NoArgsConstructor
    @AllArgsConstructor
-   @ToString
-   @EqualsAndHashCode
 
 @Entity
 @Table(name = "user_profiles")

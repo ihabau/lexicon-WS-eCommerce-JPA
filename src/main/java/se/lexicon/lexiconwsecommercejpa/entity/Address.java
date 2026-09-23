@@ -14,6 +14,8 @@ import lombok.*;
 
 
 
+   // Address is standalone - no relationships - so @ToString and
+   // @EqualsAndHashCode are safe here: nothing can walk back to an Address.
    @Getter
    @Setter
    @NoArgsConstructor

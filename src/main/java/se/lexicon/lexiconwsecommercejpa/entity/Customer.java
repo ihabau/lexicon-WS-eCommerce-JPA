@@ -13,12 +13,13 @@ import java.time.Instant;
  * The class body is empty ON PURPOSE - rebuild it (doc = Part1.md:134-152).
  * =====================================================================
  */
+   // No @ToString/@EqualsAndHashCode: `profile` is bidirectional (UserProfile
+   // has a back-reference to its customer), which would recurse forever in
+   // generated toString/equals/hashCode. Equality is the `id`.
    @Getter
    @Setter
    @NoArgsConstructor
    @AllArgsConstructor
-   @ToString
-   @EqualsAndHashCode
 
    @Entity
    @Table(name = "customers")

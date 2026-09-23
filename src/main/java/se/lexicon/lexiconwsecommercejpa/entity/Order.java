@@ -22,12 +22,14 @@ import java.util.*;
 
 
 
+   // No @ToString/@EqualsAndHashCode: the bidirectional `items` relationship
+   // (each OrderItem points back to its order) and `customer` would recurse
+   // forever if their fields were walked. Managed entities are identified by
+   // their `id`, not by comparing neighboring objects.
    @Getter
    @Setter
    @NoArgsConstructor
    @AllArgsConstructor
-   @ToString
-   @EqualsAndHashCode
 
 @Entity
 @Table(name = "orders")

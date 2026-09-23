@@ -2,7 +2,9 @@
 
 # Lexicon WS eCommerce JPA
 
-Spring Boot e-commerce platform built with JPA, focusing on One-to-One relationships.
+Spring Boot e-commerce platform built with JPA. **Part 1** covers One-to-One relationships
+(Customer / Address / UserProfile); **Part 2** adds the catalog and ordering system (Category, Product,
+Promotion, Order, OrderItem) with One-to-Many and Many-to-Many relationships.
 
 ## Tech Stack
 
@@ -131,63 +133,39 @@ erDiagram
 
 ### Repositories (Part 1)
 
-> Backed by a DAO layer (`...DAO` interfaces + `...DAOImpl`) instead of the Spring Data `JpaRepository` interfaces specified in the workshop.
+> Backed by Spring Data `JpaRepository` interfaces. Query methods are expressed as **derived queries**
+> (method-name spelling) plus a few custom JPQL `@Query` methods where the name cannot express the question.
 
-- [x] CustomerDAO / CostumerDAOImpl - fully implemented
-  - [x] Find by email (`findByEmail`)
-  - [x] Find by last name, case-insensitive (`findByLastName`)
-  - [x] Find by city (`findByCity`)
-  - [x] Find by full name / first name (`findByFullName`, `findByFirstName`)
-  - [x] CRUD: save, findAll, update, delete, deleteById, deleteByFullName
-  - [x] Existence checks: existByFirstName / existByLastName / existByFullName / existByEmail
-  - [x] Bulk updates: updateFirstNameByEmail / updateLastNameByEmail / updateFullNameByEmail
-  - [x] Optional Spring Data queries (implemented):
-    - [x] `findByEmailContaining` - email contains keyword
-    - [x] `findByCreatedAfter` - created after one date
-    - [x] `findByCreatedBetween` - created between two dates
-    - [x] `countByCity` - count of customers in a city
-- [x] UserProfileDAO / UserProfileDAOImpl - fully implemented
-  - [x] Find by nickname, case-insensitive (`findByNickName`)
-  - [x] Find by partial phone number (`findByPhoneNumberContaining`)
-  - [x] Find by bio not null (`findByBioIsNotNull`)
-  - [x] Optional: nickname prefix (`findByNickNameStartingWith`), count by phone prefix (`countByPhoneNumberStartingWith`)
-  - [x] Existence checks: existByNickName / existByPhoneNumber
-  - [x] CRUD: findById, save, findAll, update, delete, deleteById
-- [x] AddressDAO / AddressDAOImpl - fully implemented
-  - [x] Find by zip code (`findByZipCode`)
-  - [x] Optional: find by city, street name, zip code prefix, count by zip (customers)
-  - [x] Existence check: existByZipCode
-  - [x] CRUD: findById, save, findAll, update, delete, deleteById
+- [x] CustomerRepository - fully implemented
+  - [x] Required: find by email (`findByEmail`), by last name, case-insensitive (`findByLastNameIgnoreCase`),
+    by city (`findByAddressCityIgnoreCase`, nested into Address)
+  - [x] Optional: email contains keyword (`findByEmailContaining`), created after/between
+    (`findByCreatedAtAfter`, `findByCreatedAtBetween`), count by city (`countByAddressCity`),
+    exists by email (`existsByEmail`)
+- [x] UserProfileRepository - fully implemented
+  - [x] Required: find by nickname (`findByNickName`), partial phone number (`findByPhoneNumberContaining`)
+  - [x] Optional: bio not null (`findByBioIsNotNull`), nickname prefix (`findByNickNameStartingWith`),
+    count by phone prefix (`countByPhoneNumberStartingWith`)
+- [x] AddressRepository - fully implemented
+  - [x] Required: find by zip code (`findByZipCode`)
+  - [x] Optional: find by city (`findByCity`), count customers by zip code (`countCustomersByZipCode`,
+    custom JPQL)
 
-### Optional Task: CustomerRepository / CustomerDAO
+### Optional Queries: CustomerRepository
 
 From `SpringBoot-DataJPA-Workshop-Part1.md` (Repository Layer, section 1). The optional queries are five
-separate single-purpose methods, each asking one question. Do **not** overload `findByEmail` with date
-parameters - an email lookup and a date filter are different questions.
+separate single-purpose methods, each asking one question - an email lookup and a date filter are different
+questions, so they are not overloaded onto the same method:
 
-1. **Email contains a keyword**: a method like `findByEmailContaining(String keyword)`. The concept is any
-   email that has the keyword somewhere in the middle. In JPQL this is `LIKE` with `%` wildcards around the
-   bound value. The impl currently puts the `%` into the JPQL via `CONCAT`:
-   `c.email LIKE LOWER(CONCAT('%', :keyword, '%'))`. You can also build the `%` into the value you pass
-   (`"%" + keyword + "%"`) and keep the JPQL as a plain `LIKE :keyword`.
-2. **Created after a date**: takes **one** `Instant`, e.g. `findByCreatedAfter(Instant date)`. Concept:
-   `c.createdAt > :date` (use `>=` if you want to include customers created at that exact moment).
-3. **Created between two dates**: takes **two** `Instant`s (start and end), e.g.
-   `findByCreatedBetween(Instant start, Instant end)`. Concept: `c.createdAt BETWEEN :start AND :end`
-   (inclusive of both bounds).
-4. **Count customers in a city**: returns a number, not a list. Return type `long`/`Long`, e.g.
-   `countByCity(String city)`. Concept: `SELECT COUNT(c) FROM Customer c WHERE c.address.city = :city` and
-   read the single result with `.getSingleResult()`.
-5. **Exists by email**: returns `boolean`, e.g. `existByEmail(String email)` - already present in the DAO.
+1. **Email contains a keyword**: `findByEmailContaining(String keyword)`
+2. **Created after a date**: `findByCreatedAtAfter(Instant date)`
+3. **Created between two dates**: `findByCreatedAtBetween(Instant start, Instant end)` (inclusive)
+4. **Count customers in a city**: `countByAddressCity(String city)` (returns `Long`, not a list)
+5. **Exists by email**: `existsByEmail(String email)` (returns `boolean`)
 
-Reminders when writing these:
-
-- JPQL uses **entity field names** (`c.createdAt`, `c.address.city`), not database column names
-  (`created_at`, `city`).
-- The placeholder name in the JPQL string and the string inside `.setParameter("...", ...)` must match
-  exactly, or JPA throws `IllegalArgumentException` at runtime.
-- `Instant` lives in `java.time`, so the interface needs `import java.time.Instant;`.
-- Each method needs both a declaration in `CustomerDAO` and an implementation in `CostumerDAOImpl`.
+Derived-query naming rule used throughout: every capital-letter word after the subject is a property on
+the entity (nested through referenced entities when needed), and keywords like `IgnoreCase`, `Containing`,
+`After`, `Between`, `GreaterThan` are suffixes on the property they modify.
 
 ### Verification & Delivery (Part 1)
 
@@ -199,13 +177,13 @@ Reminders when writing these:
 ### Part 2: Catalog & Orders
 
 - [x] Feature branch created (`feature/jpa-part2`)
-- [ ] Entities & enums (Category, Product, Promotion, Order, OrderItem, OrderStatus)
-- [ ] Relationships (Many-to-One, One-to-Many, Many-to-Many) with ownership and cascading
-- [ ] Repositories (Category, Product, Order, Promotion) incl. N+1-safe order-status query
+- [x] Entities & enums (Category, Product, Promotion, Order, OrderItem, OrderStatus)
+- [x] Relationships (Many-to-One, One-to-Many, Many-to-Many) with ownership and cascading
+- [x] Repositories (Category, Product, Order, Promotion, OrderItem) incl. N+1-safe order-status query
+- [x] Descriptive commits for each major step (completed at the Entities, then Repositories milestones)
 - [ ] Extra task: data seeding
 - [ ] Application runs, schema generated, data seeded
-- [ ] Descriptive commits for each major step
-- [ ] Branch pushed to GitHub with link provided
+- [x] Branch pushed to GitHub with link provided
 
 ## Workshop
 

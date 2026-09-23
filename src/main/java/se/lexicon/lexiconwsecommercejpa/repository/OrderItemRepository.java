@@ -1,35 +1,21 @@
 package se.lexicon.lexiconwsecommercejpa.repository;
 
 import se.lexicon.lexiconwsecommercejpa.entity.OrderItem;
+import se.lexicon.lexiconwsecommercejpa.entity.Product;
+
+import java.util.*;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-/*
- * =====================================================================
- * ORDERITEMREPOSITORY - Part 2 (workshop Part2.md:334-343). OPTIONAL.
- *
- * OrderItem is normally managed through Order (cascade = ALL + orphanRemoval),
- * so a repository only makes sense for reporting-style queries like below.
- *
- * !!! BLOCKER: OrderItem.java is a scaffold, not a real @Entity yet.
- *
- * CRUD inherited for free.
- * =====================================================================
- */
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
-    /*
-     * TODO (OPTIONAL - Part2.md:339): items belonging to one order.
-     *   List<OrderItem> findByOrder_Id(Long orderId);
-     */
+  List<OrderItem> findByOrderId( Long orderId);
 
-    /*
-     * TODO (OPTIONAL - Part2.md:340): items for one product.
-     *   List<OrderItem> findByProduct_Id(Long productId);
-     */
+  List<OrderItem> findByProduct(Product product);
 
-    /*
-     * TODO (OPTIONAL - Part2.md:341): quantity above a value.
-     *   List<OrderItem> findByQuantityGreaterThan(Integer quantity);
-     *   TIP: "GreaterThan" === quantity > :quantity (strictly greater).
-     */
+  List<OrderItem> findByQuantityGreaterThan(int quantity);
+
+  // OPTIONAL (Part2.md:339-341): find all order items belonging to an order;
+  // find all order items for a product; find order items where the quantity
+  // is greater than a given value.
 }

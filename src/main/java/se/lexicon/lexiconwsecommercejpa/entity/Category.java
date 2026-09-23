@@ -15,12 +15,13 @@ import java.util.*;
  */
 
 
+   // No @ToString/@EqualsAndHashCode: the `products` collection is cyclic
+   // (Product has a back-reference to its category), which would recurse
+   // forever in generated toString/equals/hashCode. Equality is the `id`.
    @Getter
    @Setter
    @NoArgsConstructor
    @AllArgsConstructor
-   @ToString
-   @EqualsAndHashCode
 
    @Entity
    @Table(name = "categories")

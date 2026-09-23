@@ -2,57 +2,37 @@ package se.lexicon.lexiconwsecommercejpa.repository;
 
 import se.lexicon.lexiconwsecommercejpa.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.*;
+import java.math.*;
 
-/*
- * =====================================================================
- * PRODUCTREPOSITORY - Part 2 (workshop Part2.md:297-311).
- *
- * !!! BLOCKER: Product.java is a scaffold, not a real @Entity yet (no fields
- *     either). The nested queries below only resolve after you build the
- *     entity with a `category` column and a mapped Category.
- *
- * CRUD inherited for free.
- * =====================================================================
- */
+
+
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    /*
-     * TODO (REQUIRED - Part2.md:299): products by the CATEGORY's name.
-     *   List<Product> findByCategory_NameIgnoreCase(String categoryName);
-     *   TIP: nested property Product -> Category -> name. Written with "_"
-     *   to make the traversal unambiguous. Needs Product.category to exist.
-     */
 
-    /*
-     * TODO (REQUIRED - Part2.md:300): products inside a price range.
-     *   List<Product> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice);
-     *   TIP: "Between" === price BETWEEN :min AND :max (both bounds inclusive).
-     */
+  List<Product> findByCategoryNameIgnoreCase(String name);
 
-    /*
-     * TODO (OPTIONAL - Part2.md:306): name contains a keyword.
-     *   List<Product> findByNameContaining(String keyword);
-     */
+  List<Product> findByPriceBetween(BigDecimal lowPrice, BigDecimal highPrice);
 
-    /*
-     * TODO (OPTIONAL - Part2.md:307): cheaper than a price.
-     *   List<Product> findByPriceLessThan(BigDecimal price);
-     */
+  List<Product> findByNameContaining(String keyword);
 
-    /*
-     * TODO (OPTIONAL - Part2.md:308): sorted by price.
-     *   List<Product> findAllByOrderByPriceAsc();
-     *   List<Product> findAllByOrderByPriceDesc();
-     */
+  List<Product> findByPriceLessThan(BigDecimal price);
 
-    /*
-     * TODO (OPTIONAL - Part2.md:309): count products in a category.
-     *   Long countByCategory_Name(String categoryName);
-     *   - or by FK id: Long countByCategory_Id(Long categoryId);
-     */
+  Long countByCategoryNameIgnoreCase(String name);
 
-    /*
-     * TODO (OPTIONAL - Part2.md:310): products by category ID (FK).
-     *   List<Product> findByCategory_Id(Long categoryId);
-     */
+  List<Product> findAllByPriceAsc();
+  List<Product> findAllByPriceDesc();
+
+  List<Product> findByCategoryId(Long id);
+
+
+  // REQUIRED (Part2.md:301-302): find products by their category's name
+  // (case-insensitive, nested to the mapped Category); find products within
+  // a price range (both bounds inclusive).
+
+  // OPTIONAL (Part2.md:306-310): products whose name contains a keyword;
+  // products cheaper than a price; 
+  // products sorted by price, ascending and
+  // descending; count products in a given category; find products by the
+  // category's id (foreign key).
 }

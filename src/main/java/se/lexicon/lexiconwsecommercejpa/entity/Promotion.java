@@ -3,6 +3,7 @@ package se.lexicon.lexiconwsecommercejpa.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 
 /*
@@ -17,12 +18,13 @@ import java.util.*;
  *    Product owns the join table via its field named "promotions")
  */
 
+  // No @ToString/@EqualsAndHashCode: the `products` collection is cyclic
+  // (Product has a back-reference via promotions), which would recurse forever
+  // in generated toString/equals/hashCode. Equality is the `id`.
   @Getter
   @Setter
   @AllArgsConstructor
   @NoArgsConstructor
-  @ToString
-  @EqualsAndHashCode
 
   @Entity
   @Table(name = "promotions")
@@ -40,10 +42,10 @@ public class Promotion {
   private String code;
 
   @Column(nullable = false)
-  private Instant startDate;
+  private LocalDate startDate;
 
   @Column(nullable = true)
-  private Instant endDate;
+  private LocalDate endDate;
 
   @ManyToMany(mappedBy = "promotions" )
   private List<Product> products = new ArrayList<>();

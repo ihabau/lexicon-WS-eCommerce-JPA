@@ -25,12 +25,14 @@ import java.util.*;
  *    and remember: promotions outlive products -> no ALL-cascading here
  */
 
+  // No @ToString/@EqualsAndHashCode: category (Category has a back-reference
+  // via products) and promotions (Promotion has a back-reference via products)
+  // are cyclic, so generated toString/equals/hashCode would recurse forever.
+  // Equality for a managed entity is its `id`.
   @Getter
   @Setter
   @AllArgsConstructor
   @NoArgsConstructor
-  @ToString
-  @EqualsAndHashCode
 
   @Entity
   @Table(name = "products") 
@@ -50,7 +52,7 @@ public class Product {
   @Column(nullable = false, precision = 10, scale = 2)
   private BigDecimal price;
 
-  // From here im dont understand correctly ia helped!
+  // From here i dont understand correctly ia helped!
   @ElementCollection
   @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
   @Column(name = "image_url", nullable = false)
