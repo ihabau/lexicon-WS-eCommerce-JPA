@@ -77,7 +77,7 @@ classDiagram
         String code
         LocalDate startDate
         LocalDate endDate
-    }
+  }
 
     class Order {
         Long id
@@ -209,10 +209,10 @@ erDiagram
 
 - **Task**: Implement a relationship where many products can belong to one category.
 - **Requirements**:
-    - Use the appropriate JPA annotation to link `Product` to `Category`. Specify the foreign key column as
-      `category_id`.
-    - **Fetch Type**: Explicitly configure the fetch strategy for this relationship (consider the default for
-      `@ManyToOne`).
+  - Use the appropriate JPA annotation to link `Product` to `Category`. Specify the foreign key column as
+    `category_id`.
+  - **Fetch Type**: Explicitly configure the fetch strategy for this relationship (consider the default for
+    `@ManyToOne`).
 - **Optional**: Configure bidirectional access in the `Category` class.
 
 ---
@@ -221,13 +221,13 @@ erDiagram
 
 - **Task**: Implement a bidirectional relationship between an `Order` and its `OrderItem`s.
 - **Requirements**:
-    - Identify which side should hold the foreign key (`order_id`) and mark it as the owner side.
-    - Use the `mappedBy` attribute correctly on the inverse side.
-    - **Cascading**: Configure cascading so that saving or deleting an `Order` affects its items, and ensure orphan
-      removal is enabled.
-    - **Fetch Type**: Configure the fetch type for the collection of items (consider the default for `@OneToMany`).
+  - Identify which side should hold the foreign key (`order_id`) and mark it as the owner side.
+  - Use the `mappedBy` attribute correctly on the inverse side.
+  - **Cascading**: Configure cascading so that saving or deleting an `Order` affects its items, and ensure orphan
+    removal is enabled.
+  - **Fetch Type**: Configure the fetch type for the collection of items (consider the default for `@OneToMany`).
 - **Business Rule**:
-    - An `Order` must contain at least one `OrderItem` before it is saved.
+  - An `Order` must contain at least one `OrderItem` before it is saved.
 
 ---
 
@@ -235,8 +235,8 @@ erDiagram
 
 - **Task**: Link each `Order` to exactly one `Customer` (from Part 1).
 - **Requirements**:
-    - Map a `@ManyToOne` from `Order` to `Customer` with a foreign key column named `customer_id`.
-    - **Fetch Type**: Explicitly configure the fetch strategy (consider the default for `@ManyToOne`).
+  - Map a `@ManyToOne` from `Order` to `Customer` with a foreign key column named `customer_id`.
+  - **Fetch Type**: Explicitly configure the fetch strategy (consider the default for `@ManyToOne`).
 
 ---
 
@@ -244,7 +244,7 @@ erDiagram
 
 - **Task**: Add an `OrderStatus` field to `Order`.
 - **Requirements**:
-    - Store the enum value as a readable string in the database (not an ordinal).
+  - Store the enum value as a readable string in the database (not an ordinal).
 
 ---
 
@@ -253,12 +253,12 @@ erDiagram
 - **Task**: Implement a relationship where a product can have multiple active promotions and a promotion can apply to
   multiple products.
 - **Requirements**:
-    - Use a join table (e.g., `products_promotions`) to manage this relationship with join columns `product_id` and
-      `promotion_id`.
-    - In this workshop, **Product is the owner side** and defines the join table.
-    - If making it bidirectional, ensure the other side ensures the other side uses the `mappedBy` attribute.
-    - **Fetch Type**: Specify the fetch type for the many-to-many relationship.
-    - **Cascading**: Avoid `CascadeType.ALL` for this relationship.
+  - Use a join table (e.g., `products_promotions`) to manage this relationship with join columns `product_id` and
+    `promotion_id`.
+  - In this workshop, **Product is the owner side** and defines the join table.
+  - If making it bidirectional, ensure the other side ensures the other side uses the `mappedBy` attribute.
+  - **Fetch Type**: Specify the fetch type for the many-to-many relationship.
+  - **Cascading**: Avoid `CascadeType.ALL` for this relationship.
 
 ---
 
@@ -266,11 +266,11 @@ erDiagram
 
 - **Task**: Link `OrderItem` to `Product`.
 - **Requirements**:
-    - Ensure each `OrderItem` references exactly one `Product`.
-    - **Fetch Type**: Configure the fetch type for this relationship (referencing the product).
+  - Ensure each `OrderItem` references exactly one `Product`.
+  - **Fetch Type**: Configure the fetch type for this relationship (referencing the product).
 - **Note**:
-    - Consider why `priceAtPurchase` is stored in `OrderItem` instead of just relying on the current price in the
-      `Product` entity.
+  - Consider why `priceAtPurchase` is stored in `OrderItem` instead of just relying on the current price in the
+    `Product` entity.
 
 ---
 
@@ -287,10 +287,12 @@ You are expected to use Spring Data JPA query method naming and, where appropria
 ### 1. CategoryRepository
 
 #### Required Queries
+
 - Find a category by name (case-insensitive).
 - Check if a category exists by name.
 
 #### Optional / Advanced Queries
+
 - Find categories whose name contains a given keyword.
 - Count how many categories exist.
 
@@ -299,10 +301,12 @@ You are expected to use Spring Data JPA query method naming and, where appropria
 ### 2. ProductRepository
 
 #### Required Queries
+
 - Find products by their category name.
 - Find products within a specific price range.
 
 #### Optional / Advanced Queries
+
 - Find products whose name contains a given keyword.
 - Find products cheaper than a given price.
 - Find products ordered by price (ascending or descending).
@@ -314,10 +318,12 @@ You are expected to use Spring Data JPA query method naming and, where appropria
 ### 3. OrderRepository
 
 #### Required Queries
+
 - Find all orders belonging to a specific customer ID.
 - Find orders by status and use a strategy to avoid the **N+1 problem** (loading order items in the same query).
 
 #### Optional / Advanced Queries
+
 - Find orders created after a specific date.
 - Find orders created between two dates.
 - Find orders that contain a specific product.
@@ -326,6 +332,7 @@ You are expected to use Spring Data JPA query method naming and, where appropria
 
 **Clarification (N+1)**  
 For the “find by status” query, use one of the following approaches:
+
 - `@EntityGraph` to load `items` in the same query, **or**
 - `JOIN FETCH` in JPQL.
 
@@ -336,6 +343,7 @@ For the “find by status” query, use one of the following approaches:
 > This repository is optional because `OrderItem` is typically managed through `Order` using cascading and orphan removal.
 
 #### Optional / Advanced Queries
+
 - Find all order items belonging to a specific order ID.
 - Find all order items for a specific product ID.
 - Find order items where quantity is greater than a given value.
@@ -345,9 +353,11 @@ For the “find by status” query, use one of the following approaches:
 ### 5. PromotionRepository
 
 #### Required Queries
+
 - Find promotions that are active on a given date.
 
 #### Optional / Advanced Queries
+
 - Find promotions by code.
 - Find promotions starting after a given date.
 - Find promotions ending before a given date.
@@ -361,11 +371,13 @@ For the “find by status” query, use one of the following approaches:
 When the application runs, create a mechanism to automatically insert initial test data into the database.
 
 ### Goals
+
 - Automatically insert a list of categories.
 - Automatically insert a list of products linked to those categories.
 - Ensure that the data is only inserted once (avoid duplicates).
 
 ### Requirements
+
 - Categories must be created before products.
 - Each product must reference an existing category.
 - The application should still start successfully if the data already exists.
@@ -373,6 +385,7 @@ When the application runs, create a mechanism to automatically insert initial te
 ---
 
 ### Learning Goals
+
 - Practice navigating nested properties in query methods.
 - Understand when derived queries are sufficient and when custom queries are needed.
 - Explore strategies for avoiding the N+1 problem (EntityGraph vs Join Fetch).

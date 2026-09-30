@@ -7,17 +7,51 @@ import java.util.*;
 
 
 /*
- * ORDER - Part 2 entity (Part2.md:220-243).
- * TODO: build it.
- *  - a JPA entity mapped to the "orders" table (NOT "order" - reserved word)
- *  - identity-generated primary key (Long id)
- *  - orderDate: set automatically at persist time, then immutable
- *  - status: an enum stored as a readable STRING in the DB (mandatory)
- *  - many-to-one to Customer (FK "customer_id", fetch strategy explicit)
- *  - one-to-many to items - the INVERSE side, but with cascade + orphan
- *    removal so the Order owns its items' lifecycle; lazy
- *  - business rule: an Order must have at least ONE item before saving
- *    (enforce it in a lifecycle callback)
+ * The class is named in the assignment's diagram; the table is your choice, and
+ * @Table(name = "orders") is not a flourish: ORDER is a SQL reserved word, so a
+ * generated table called "order" is a syntax error the moment anyone writes a
+ * JOIN in raw SQL. Remove the annotation to "simplify" and Hibernate derives
+ * "order" from the class and breaks.
+ *
+ * @OneToMany(mappedBy = "order") + cascade = ALL - both are correct and both are
+ * required, and they are genuinely INDEPENDENT of each other:
+ *   cascade  = "when I save/delete the Order, do the same to the items"
+ *   mappedBy = "the column is over there, in the other table"
+ *   orphanRemoval = "if an item is REMOVED from the list, delete its row"
+ * They are about LIFETIME, not column ownership. Without the cascade, saving an
+ * order with three new items would insert the order and silently lose the items.
+ * Without orphanRemoval, removing an item from the list would leave an orphan
+ * row with a dangling order_id.
+ *
+ * The child must point back. Hibernate fixes both sides for order.getItems()
+ * .add(item), but a collection built by hand - the way OrderMapper builds it -
+ * needs item.setOrder(order) explicitly, or the insert fails on a null
+ * order_id (nullable = false) or, worse, attaches the item to the WRONG order.
+ *
+ * No cascade on customer: a customer outlives its orders, and deleting a customer
+ * should not delete what they bought. Same lifetime question as
+ * Product.promotions.
+ *
+ * @PrePersist carries TWO rules:
+ *   orderDate - set on the way into the database, then @Column(updatable = false)
+ *     stops it ever changing. The `if (orderDate == null)` guard lets a test or
+ *     a seeder set a chosen date instead. Same pattern as Customer.createdAt.
+ *   the one-item rule - throwing from @PrePersist is the right place, because it
+ *     is the last moment before the INSERT, so the order is not half written.
+ *     IllegalStateException is unchecked, so no `throws` is needed.
+ *
+ * TRAP: items has NO initialiser, so a freshly built Order holds null - which is
+ * why the check tests `items == null ||` and not just isEmpty(). Same null-vs-
+ * empty trap as Category.products and Product.imageUrls.
+ *
+ * @Enumerated(STRING) because the default ORDINAL stores 0,1,2,3. Beyond being
+ * unreadable, reordering the enum constants silently REWRITES EXISTING DATA:
+ * insert CANCELLED between PAID and SHIPPED and every shipped order in the table
+ * becomes cancelled. That is why OrderStatus is never renumbered.
+ *
+ * There is deliberately no total/order-amount column. Nothing asks for one and
+ * it is derivable (sum of priceAtPurchase * quantity); storing it would mean
+ * recalculating on every item change and creates a second source of truth.
  */
 
 

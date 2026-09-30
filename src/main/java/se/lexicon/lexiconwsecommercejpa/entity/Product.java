@@ -6,23 +6,50 @@ import java.math.BigDecimal;
 import java.util.*;
 
 /*
- * PRODUCT - Part 2 entity (Part2.md:208-217, 251-262).
- * TODO: build it.
- *  - a JPA entity mapped to the "products" table
- *  - identity-generated primary key (Long id)
- *  - name: mandatory, max 100
- *  - price: mandatory, BigDecimal, with precision/scale (money!)
- *  - imageUrls: a collection of simple String values stored in a SEPARATE
+ * @ElementCollection - the one annotation that creates a table WITHOUT another
+ * entity. imageUrls is a List<String> and there is no Image entity in this
+ * project, so this tells JPA the collection deserves a table of its own whose
+ * only columns are the owner's FK and the element:
+ *     product_images (product_id BIGINT FK -> products.id, image_url VARCHAR)
  *
- *    
- *    table (product_images) via the product_id foreign key
+ * Why an element collection rather than a @ManyToMany: a @ManyToMany needs two
+ * entities with their own ids and columns. An image url is a VALUE, not a thing
+ * - it has no identity of its own. The test to apply: does the thing on the other
+ * end need its own row and columns? Promotion does; an image url does not.
  *
+ * TRAP: this field has NO initialiser, so a new Product holds null here, and
+ * Hibernate refuses to save a null @ElementCollection. It must be an empty list
+ * meaning "no photos", never null. Compare promotions below, which does say
+ * `= new ArrayList<>()`; that asymmetry is the trap.
  *
- *  - many-to-one to Category - the OWNER side (FK "GeneratedValuegory_id"),
- *    fetch strategy set EXPLICITLY
- *  - many-to-many to Promotion - the OWNER side, join table
- *    "products_promotions" (product_id + promotion_id), LAZY fetch,
- *    and remember: promotions outlive products -> no ALL-cascading here
+ * @ManyToOne(fetch = LAZY) - the @ManyToOne default is EAGER, so writing LAZY
+ * is real work, not a no-op. Lazy is right here: listing products should not
+ * also issue one query per product to fetch its category. The cost is that a
+ * lazy association can only be read while the session is open - see
+ * ProductRepository's @EntityGraph, which is how this gets mapped afterwards.
+ *
+ * @ManyToMany with NO CascadeType.ALL, deliberately. A promotion is SHARED: it
+ * applies to many products and has its own dates, so it outlives any single
+ * product. With CascadeType.ALL, deleting one product would delete the promotion
+ * and with it every other product's discount - data loss on the first delete.
+ *
+ * Product is the OWNER, which is why @JoinTable lives HERE and not on Promotion:
+ *   joinColumns        = FK back to THIS side -> product_id
+ *   inverseJoinColumns = FK to the other side -> promotion_id
+ * Get those two the wrong way round and the schema generates happily with
+ * nonsense data. Promotion.products then only needs mappedBy = "promotions".
+ *
+ * The List collection type is allowed but worth a question: a @ManyToMany is
+ * semantically a Set, and a List implies an ORDER this relationship does not
+ * have. Two reads of the same product can hand you the promotions in different
+ * orders, which is a real source of flaky tests. Fix is @OrderColumn, or
+ * Set/LinkedHashSet.
+ *
+ * price: precision 10 / scale 2 is DECIMAL(10,2), up to 99 999 999.99. Money is
+ * never a double - 0.1 + 0.2 is not 0.3 in binary floating point. This also
+ * lines up with @Digits(integer = 8, fraction = 2) on ProductRequest: the same
+ * rule written twice, once in the DTO so the client gets a clean 400 and once on
+ * the column so the database is the last line of defence. 10 - 2 = 8.
  */
 
   // No @ToString/@EqualsAndHashCode: category (Category has a back-reference
@@ -35,7 +62,7 @@ import java.util.*;
   @NoArgsConstructor
 
   @Entity
-  @Table(name = "products") 
+  @Table(name = "products")
 
 
 

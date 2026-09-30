@@ -34,3 +34,6 @@ build/
 
 ### Local backups (old DAO pattern - not part of the project) ###
 /backup/
+
+### Session handoff notes (local only, not shared) ###
+AGENTS.md

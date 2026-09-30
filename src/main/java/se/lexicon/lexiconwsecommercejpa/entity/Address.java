@@ -4,12 +4,25 @@ import jakarta.persistence.*;
 import lombok.*;
 
 /*
- * ADDRESS - Part 1 entity (Part1.md:114-121).
- * TODO: build it.
- *  - a JPA entity mapped to the "addresses" table
- *  - identity-generated primary key (Long id)
- *  - street, city, zipCode: all mandatory columns
- *  - standalone: does NOT reference Customer
+ * WHY NO `length` ON THESE THREE COLUMNS: the assignment only says they must be
+ * mandatory, and gives no length - unlike UserProfile (max 100) and Customer
+ * (100/100/150). So `nullable = false` alone is a correct reading, and adding
+ * length = 100 here would be inventing a requirement. Hibernate's default is
+ * VARCHAR(255). Worth knowing: a constraint you were not asked for is still a
+ * decision, and a decision you did not write down is a trap for the next person.
+ *
+ * WHY @ToString AND @EqualsAndHashCode SURVIVE HERE AND NOWHERE ELSE: both walk
+ * EVERY field, and on this class the walk terminates - four scalar fields, nothing
+ * points back. Put the same two annotations on Customer and you get
+ * customer -> profile -> customer -> ... forever, i.e. a StackOverflowError the
+ * first time anything logs the object. Same story in Category, Product, Order and
+ * OrderItem, which is why every other entity has the "No @ToString" note above
+ * its Lombok block.
+ *
+ * @EqualsAndHashCode is the more dangerous of the pair: it is what HashSet and
+ * HashMap use, so if a bidirectional relationship makes equals() asymmetric,
+ * putting entities in a Set silently loses elements. Managed entities are
+ * identified by their id, and the JPA default is usually the right answer.
  */
 
 
@@ -29,7 +42,7 @@ import lombok.*;
 
 public class Address {
     // TODO: add fields + JPA annotations per the requirements above.
-    //
+     //
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

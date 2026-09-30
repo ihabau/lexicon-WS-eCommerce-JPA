@@ -4,13 +4,15 @@
 
 Spring Boot e-commerce platform built with JPA. **Part 1** covers One-to-One relationships
 (Customer / Address / UserProfile); **Part 2** adds the catalog and ordering system (Category, Product,
-Promotion, Order, OrderItem) with One-to-Many and Many-to-Many relationships.
+Promotion, Order, OrderItem) with One-to-Many and Many-to-Many relationships; **Part 3** adds the
+Service Layer, DTOs (Java Records) and Mappers so the presentation layer never touches entities.
 
 ## Tech Stack
 
 - Java 17
 - Spring Boot 4.1.1
 - Spring Data JPA
+- Spring Boot Validation (Bean Validation on DTOs)
 - H2 (runtime/test) + MySQL (production/development)
 - Lombok
 - Maven
@@ -185,10 +187,84 @@ the entity (nested through referenced entities when needed), and keywords like `
 - [ ] Application runs, schema generated, data seeded
 - [x] Branch pushed to GitHub with link provided
 
+### Part 3: Service Layer, DTOs & Mappers
+
+> Source: `SpringBoot-DataJPA-Service-Layer-WorkShop3.md`. Goal is to decouple the persistence layer from the
+> presentation layer: controllers (Part 4) will only ever see DTOs, never `@Entity` classes. Packages are named
+> as in the assignment: `se.lexicon.ecommerceworkshop.dto` / `.mapper` / `.service`.
+
+#### Architecture
+
+```mermaid
+graph TD
+    API[Controller Layer - not yet implemented] --> Service[Service Layer - Part 3]
+    Service --> Mapper[Mapper Component]
+    Service --> Repo[Repository Layer - Parts 1 and 2]
+    Mapper --> DTO[DTO / Form Objects]
+    Mapper --> Entity[JPA Entities]
+```
+
+#### DTOs (Java Records, `...dto`)
+
+Records are immutable and have no setters, so mappers must use the **canonical constructor** when building
+them, and entities are populated field-by-field on the way back.
+
+- [ ] `CustomerRequest` - `firstName`, `lastName`, `email`, `password`, `street`, `city`, `zipCode`
+  - [ ] Validated with `@NotBlank`, `@Email`, `@Size(min = ...)`
+- [ ] `CustomerResponse` - `id`, `fullName`, `email`, `addressResponse`
+- [ ] `AddressResponse` - street / city / zip code of the customer
+- [ ] `ProductRequest` - `name`, `price`, `categoryId`
+- [ ] `ProductResponse` - flattened product including `categoryName` (no nested category object)
+- [ ] `CategoryResponse` - `id`, `name`
+- [ ] `OrderRequest` - `customerId` + list of items (`productId` + `quantity`)
+  - [ ] Validated with `@NotEmpty` on the item list and `@Min(1)` on each quantity
+- [ ] `OrderResponse` - order details + status + `List<OrderItemResponse>`
+- [ ] `OrderItemResponse` - product id/name, quantity, `priceAtPurchase`
+
+#### Mappers (`...mapper`, Spring `@Component`)
+
+Each mapper owns both directions of the translation so that no other layer has to know the entity shape.
+
+- [ ] `CustomerMapper` - `toResponse(Customer)`, `toEntity(CustomerRequest)`
+- [ ] `ProductMapper` - `toResponse(Product)`, `toEntity(ProductRequest)`
+- [ ] `OrderMapper` - `toEntity(OrderRequest, Customer, List<Product>)` (builds `Order` + `OrderItem`s) and
+      `toResponse(Order)` (includes items, so the `Order.items` collection must be initialized)
+
+#### Services (`...service`, Interface / Implementation)
+
+- [ ] `CustomerService` + `CustomerServiceImpl`
+  - [ ] `register(CustomerRequest)` - reject the email if already taken (`existsByEmail`)
+  - [ ] `findById(Long)` - return `CustomerResponse` or throw `ResourceNotFoundException`
+  - [ ] `update(Long, CustomerRequest)` - update the details
+- [ ] `ProductService` + `ProductServiceImpl`
+  - [ ] `create(ProductRequest)` - validate that the category exists before saving
+  - [ ] `findAll()` - `List<ProductResponse>`
+  - [ ] `searchByName(String)` - filtered results (delegates to `findByNameContaining`)
+- [ ] `OrderService` + `OrderServiceImpl`
+  - [ ] `placeOrder(OrderRequest)` - find customer, find each product, capture the **current** price as
+        `priceAtPurchase`, apply active promotions, save order with items
+  - [ ] Annotated `@Transactional` so the whole order is all-or-nothing
+- [ ] Optional: `CategoryService` - `create(String name)` (duplicate check via `existsByName`), `findAll()`
+- [ ] Optional: `PromotionService` - `getActivePromotions()`, `calculateDiscount(Product)`
+
+#### Transactions, exceptions & delivery
+
+- [ ] `@Transactional` on business-critical methods; uncaught runtime exceptions roll the whole
+      `placeOrder` back (no half-written orders)
+- [ ] Custom exceptions (e.g. `ResourceNotFoundException`, duplicate-email) instead of raw
+      `EntityNotFoundException` leaking out of the service
+- [ ] `spring-boot-starter-validation` present in `pom.xml` (already the case)
+- [ ] Optional: `MapStruct` dependency - manual mappers are the recommended approach
+- [ ] Feature branch created (`feature/service-layer`)
+- [ ] Descriptive commits for each major step (DTOs, mappers, services, transactions/exceptions)
+- [ ] Application runs and all service methods verified
+- [ ] Branch pushed to GitHub with link provided
+
 ## Workshop
 
 See `SpringBoot-DataJPA-Workshop-Part1.md` for the full assignment details.
 See `SpringBoot-DataJPA-Workshop-Part2.md` for Part 2 (catalog management, transactions, many-to-many).
+See `SpringBoot-DataJPA-Service-Layer-WorkShop3.md` for Part 3 (service layer, DTOs, mappers).
 
 ## Notes
 
