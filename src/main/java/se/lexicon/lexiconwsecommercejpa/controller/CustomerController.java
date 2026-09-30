@@ -1,24 +1,9 @@
 package se.lexicon.lexiconwsecommercejpa.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import se.lexicon.lexiconwsecommercejpa.dto.CustomerRequest;
-import se.lexicon.lexiconwsecommercejpa.dto.CustomerResponse;
-import se.lexicon.lexiconwsecommercejpa.exception.EmailAlreadyExistsException;
-import se.lexicon.lexiconwsecommercejpa.exception.ResourceNotFoundException;
-import se.lexicon.lexiconwsecommercejpa.service.CustomerService;
-
-import jakarta.validation.Valid;
-import java.util.List;
-
-@RestController
-@RequestMapping("/api/v1/customers")
+// TODO: Add required imports (Spring web annotations, validation, DTOs, service) for teaching
+// TODO: Annotate as REST controller with base mapping
+// TODO: Inject service via constructor
+// TODO: Implement methods according to Part 4 spec
 public class CustomerController {
-
-
-} 
-
-
-
+  // TODO: Add implementation
+}
