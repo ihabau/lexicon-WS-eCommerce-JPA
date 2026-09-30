@@ -41,8 +41,6 @@ import lombok.*;
 
 
 public class Address {
-    // TODO: add fields + JPA annotations per the requirements above.
-     //
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -70,8 +70,6 @@ import java.util.*;
 
 
 public class Order {
-    // TODO: add fields + JPA annotations per the requirements above.
-
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

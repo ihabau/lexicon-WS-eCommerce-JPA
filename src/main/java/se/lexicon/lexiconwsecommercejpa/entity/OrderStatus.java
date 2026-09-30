@@ -35,5 +35,4 @@ public enum OrderStatus {
     PAID,
     SHIPPED,
     CANCELLED
-    // TODO: stored in the DB as a STRING - remember @Enumerated(EnumType.STRING) in Order.status.
 }

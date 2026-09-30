@@ -57,8 +57,6 @@ import java.util.*;
 
 
 public class Promotion {
-    // TODO: add fields + JPA annotations per the requirements above.
-
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

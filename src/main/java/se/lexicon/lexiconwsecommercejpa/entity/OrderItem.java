@@ -65,9 +65,8 @@ import java.math.BigDecimal;
 
 
 public class OrderItem {
-    // TODO: add fields + JPA annotations per the requirements above.
 
-@Id
+ @Id
 @GeneratedValue( strategy = GenerationType.IDENTITY )
 private Long id;
 

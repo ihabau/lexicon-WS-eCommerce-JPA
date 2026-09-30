@@ -151,7 +151,7 @@ Configure Swagger UI using SpringDoc OpenAPI to provide interactive and auto-gen
 
 ## Submission Checklist
 
-- [ ] **Git Branch**: Create a feature branch for Part 4 (e.g., `feature/rest-api`).
+- [x] **Git Branch**: Create a feature branch for Part 4 (e.g., `feature/rest-api`).
 - [ ] **Controllers**: Implement the required REST controllers with appropriate Spring annotations.
 - [ ] **Endpoints**: Create the required REST endpoints for CRUD operations and searching.
 - [ ] **Exception Handling**: Implement a Global Exception Handler for consistent error responses.

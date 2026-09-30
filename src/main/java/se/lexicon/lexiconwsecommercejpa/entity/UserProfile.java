@@ -37,8 +37,6 @@ import lombok.*;
 
 
 public class UserProfile {
-    // TODO: add fields + JPA annotations per the requirements above.
-
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
